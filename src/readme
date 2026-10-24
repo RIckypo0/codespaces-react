@@ -1,0 +1,50 @@
+# Medication Reminder (Python)
+
+A browser-based medication schedule built with Python and Streamlit. It supports
+email/password accounts, private saved schedules, AM/PM times, editing and
+deleting medicines, a taken-history list, and optional medicine-label text
+recognition from a camera photo.
+
+## Run it locally
+
+1. Install Python 3.11 or newer.
+2. In a terminal, install the packages:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Install Tesseract OCR. On Streamlit Community Cloud, `packages.txt` installs
+   it automatically. On your own computer, install Tesseract for your operating
+   system and make sure the `tesseract` command is available.
+4. Create a Supabase project and run `supabase_setup.sql` in its SQL Editor.
+5. Create `.streamlit/secrets.toml` with your Supabase project URL and
+   publishable/anon key:
+
+   ```toml
+   SUPABASE_URL = "your-project-url"
+   SUPABASE_ANON_KEY = "your-publishable-or-anon-key"
+   ```
+
+   Never use a Supabase service-role key in this app or commit secrets to GitHub.
+6. Start the app:
+
+   ```bash
+   streamlit run main.py
+   ```
+
+## Put it on GitHub and run it online
+
+Upload `main.py`, `requirements.txt`, `packages.txt`, `supabase_setup.sql`, and
+this README to a GitHub repository. In Streamlit Community Cloud, create an app
+from that repository and select `main.py` as the app file. Add `SUPABASE_URL`
+and `SUPABASE_ANON_KEY` in the app's Secrets settings.
+
+## Important notes
+
+- The label reader is OCR: it can misread words or numbers. Review and correct
+  the text against the medicine package or instructions from your pharmacist
+  before using it. It does not determine a dose or schedule.
+- This browser app does not send phone alarms or notifications.
+- It is a tracking aid, not medical advice. Follow instructions from your
+  healthcare professional.
