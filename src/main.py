@@ -15,7 +15,259 @@ import pytesseract
 from supabase import create_client
 
 
-st.set_page_config(page_title="Medication Reminder", page_icon="💊", layout="centered")
+st.set_page_config(page_title="Medication Reminder", page_icon="💊", layout="wide")
+
+
+def apply_app_theme():
+    """Give the browser app a calm, readable visual style."""
+    st.markdown(
+        """
+        <style>
+        [data-testid="stAppViewContainer"] {
+            background: #f5f8f5;
+        }
+        [data-testid="stMainBlockContainer"] {
+            max-width: 980px;
+            padding-top: 2rem;
+            padding-bottom: 3rem;
+        }
+        [data-testid="stHeader"] {
+            background: rgba(245, 248, 245, 0.85);
+        }
+        [data-testid="stVerticalBlockBorderWrapper"] {
+            border-color: #dce8df;
+            border-radius: 16px;
+            background: #ffffff;
+        }
+        div.stButton > button[kind="primary"],
+        div.stFormSubmitButton > button[kind="primary"] {
+            background: #176b54;
+            border-color: #176b54;
+            color: #ffffff;
+            border-radius: 10px;
+            font-weight: 650;
+        }
+        div.stButton > button[kind="primary"]:hover,
+        div.stFormSubmitButton > button[kind="primary"]:hover {
+            background: #105440;
+            border-color: #105440;
+            color: #ffffff;
+        }
+        .med-brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 0 0 1rem;
+            padding: 1.35rem 1.5rem;
+            border: 1px solid #dce8df;
+            border-radius: 20px;
+            background: linear-gradient(120deg, #ffffff 0%, #e9f4ed 100%);
+        }
+        .med-brand-icon {
+            display: grid;
+            place-items: center;
+            width: 54px;
+            height: 54px;
+            flex: 0 0 54px;
+            border-radius: 16px;
+            background: #d8eee0;
+            font-size: 28px;
+        }
+        .med-brand-kicker {
+            margin: 0 0 3px;
+            color: #176b54;
+            font-size: 0.72rem;
+            font-weight: 750;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+        .med-brand h1 {
+            margin: 0;
+            color: #173c31;
+            font-size: clamp(1.65rem, 4vw, 2.25rem);
+            line-height: 1.15;
+        }
+        .med-brand-copy {
+            margin: 6px 0 0;
+            color: #52665b;
+            font-size: 0.98rem;
+        }
+        .progress-label {
+            color: #176b54;
+            font-weight: 700;
+        }
+        @media (max-width: 600px) {
+            [data-testid="stMainBlockContainer"] {
+                padding: 1rem 1rem 2rem;
+            }
+            .med-brand {
+                gap: 12px;
+                padding: 1rem;
+            }
+            .med-brand-icon {
+                width: 46px;
+                height: 46px;
+                flex-basis: 46px;
+                font-size: 24px;
+            }
+        }
+        :root {
+            color-scheme: light;
+            --care-ink: #203b32;
+            --care-muted: #5e746a;
+            --care-green: #236b52;
+            --care-green-deep: #18543f;
+            --care-paper: #f6f8f3;
+            --care-line: #d9e5dc;
+            --care-white: #fffefa;
+        }
+        [data-testid="stAppViewContainer"] {
+            background:
+                radial-gradient(ellipse at 7% 2%, rgba(213, 235, 219, .6), transparent 31rem),
+                var(--care-paper);
+            color: var(--care-ink);
+        }
+        [data-testid="stAppViewContainer"]::before {
+            content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .15;
+            background-image: radial-gradient(#769181 .55px, transparent .55px);
+            background-size: 17px 17px;
+            mask-image: linear-gradient(to bottom, black, transparent 70%);
+        }
+        [data-testid="stMainBlockContainer"] { max-width: 1040px; padding: 2.3rem 2rem 4rem; }
+        [data-testid="stHeader"] { background: rgba(246, 248, 243, .82); }
+        h1, h2, h3, h4, p, label, [data-testid="stMarkdownContainer"] { color: var(--care-ink); }
+        h2, h3 { letter-spacing: -.025em; }
+        [data-testid="stCaptionContainer"], .stCaption { color: var(--care-muted); }
+        [data-testid="stVerticalBlockBorderWrapper"] {
+            border: 1px solid var(--care-line); border-radius: 19px;
+            background: rgba(255, 254, 250, .88); box-shadow: 0 7px 24px rgba(39, 75, 55, .045);
+        }
+        [data-testid="stTabs"] [data-baseweb="tab-list"] {
+            gap: .45rem; border-bottom: 1px solid var(--care-line);
+        }
+        [data-testid="stTabs"] button[data-baseweb="tab"] {
+            min-height: 3rem; padding: .65rem 1.05rem; border-radius: 12px 12px 0 0;
+            color: var(--care-muted); font-weight: 650;
+        }
+        [data-testid="stTabs"] button[data-baseweb="tab"][aria-selected="true"] {
+            color: var(--care-green-deep); background: #e8f2eb;
+        }
+        [data-testid="stTabs"] [data-baseweb="tab-highlight"] { background-color: var(--care-green); }
+        [data-testid="stTextInput"] input, [data-testid="stTextArea"] textarea,
+        [data-testid="stSelectbox"] [data-baseweb="select"] > div,
+        [data-testid="stMultiSelect"] [data-baseweb="select"] > div {
+            border-color: #cbdacf; border-radius: 11px; background-color: var(--care-white);
+        }
+        [data-testid="stTextInput"] input:focus, [data-testid="stTextArea"] textarea:focus {
+            border-color: var(--care-green); box-shadow: 0 0 0 2px rgba(35, 107, 82, .15);
+        }
+        [data-testid="stForm"] {
+            padding: 1rem 1.15rem 1.15rem; border: 1px solid #e0e9e1;
+            border-radius: 16px; background: rgba(255, 254, 250, .72);
+        }
+        [data-testid="stExpander"] {
+            border: 1px solid var(--care-line); border-radius: 14px;
+            overflow: hidden; background: rgba(255, 254, 250, .75);
+        }
+        [data-testid="stAlert"] { border-radius: 14px; border-width: 1px; }
+        [data-testid="stProgress"] > div > div { background-color: var(--care-green); }
+        [data-testid="stMetric"] {
+            padding: .85rem 1rem; border: 1px solid #dce9df;
+            border-radius: 14px; background: #f0f6f0;
+        }
+        [data-testid="stMetricLabel"] { color: var(--care-muted); }
+        [data-testid="stMetricValue"] { color: var(--care-green-deep); }
+        [data-testid="stCameraInput"] {
+            padding: .5rem; border: 1px dashed #b9cdbd;
+            border-radius: 14px; background: #f4f8f3;
+        }
+        div.stButton > button[kind="primary"], div.stFormSubmitButton > button[kind="primary"] {
+            min-height: 2.75rem; padding: .55rem 1.1rem; background: var(--care-green);
+            border-color: var(--care-green); color: #ffffff; border-radius: 11px;
+            font-weight: 700; transition: background-color .16s ease, transform .16s ease;
+        }
+        div.stButton > button[kind="primary"]:hover, div.stFormSubmitButton > button[kind="primary"]:hover {
+            background: var(--care-green-deep); border-color: var(--care-green-deep);
+            color: #ffffff; transform: translateY(-1px);
+        }
+        div.stButton > button:not([kind="primary"]), div.stFormSubmitButton > button:not([kind="primary"]) {
+            min-height: 2.65rem; border-radius: 11px; border-color: #cbdacf;
+            color: var(--care-green-deep); background: var(--care-white); font-weight: 650;
+        }
+        button:focus-visible, a:focus-visible, input:focus-visible,
+        textarea:focus-visible, [role="combobox"]:focus-visible {
+            outline: 3px solid rgba(35, 107, 82, .55) !important; outline-offset: 2px !important;
+        }
+        .med-brand {
+            position: relative; overflow: hidden; padding: 1.45rem 1.65rem;
+            border: 1px solid #d6e5d9; border-radius: 22px;
+            background: linear-gradient(112deg, #fffefa 0%, #eef6ee 63%, #e4f0e7 100%);
+            box-shadow: 0 12px 34px rgba(39, 75, 55, .07);
+        }
+        .med-brand::after {
+            content: ""; position: absolute; width: 190px; height: 190px; right: -52px; top: -107px;
+            border: 1px solid rgba(35, 107, 82, .13); border-radius: 50%;
+            box-shadow: 0 0 0 22px rgba(35, 107, 82, .035), 0 0 0 45px rgba(35, 107, 82, .025);
+            pointer-events: none;
+        }
+        .med-brand-icon {
+            background: #d9ecde; color: var(--care-green-deep); border-radius: 17px;
+        }
+        .med-brand-icon svg { width: 30px; height: 30px; }
+        .med-brand-content { position: relative; z-index: 1; }
+        .med-brand-kicker {
+            color: var(--care-green); font-size: .72rem; letter-spacing: .13em;
+        }
+        .med-brand h1 {
+            color: #1d4033; font-size: clamp(1.7rem, 4vw, 2.35rem);
+            line-height: 1.12; letter-spacing: -.04em;
+        }
+        .med-brand-copy { margin: 7px 0 0; color: #52695e; font-size: 1rem; }
+        .progress-label { color: var(--care-green-deep); font-weight: 700; }
+        [data-testid="stForm"] label { font-weight: 600; }
+        @media (max-width: 600px) {
+            [data-testid="stMainBlockContainer"] { padding: 1rem 1rem 2.5rem; }
+            .med-brand { gap: 12px; padding: 1.05rem; border-radius: 18px; }
+            .med-brand-icon { width: 46px; height: 46px; flex-basis: 46px; }
+            .med-brand-icon svg { width: 26px; height: 26px; }
+            .med-brand-copy { font-size: .92rem; }
+            [data-testid="stTabs"] button[data-baseweb="tab"] { padding-inline: .7rem; font-size: .91rem; }
+            [data-testid="stForm"] { padding: .8rem; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { transition-duration: .01ms !important; }
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_brand_header(copy):
+    st.markdown(
+        f"""
+        <div class="med-brand">
+            <div class="med-brand-icon" aria-hidden="true">
+                <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g transform="rotate(-42 16 16)">
+                        <rect x="7" y="5" width="18" height="22" rx="9" fill="#236b52"/>
+                        <path d="M7 16h18" stroke="#f8fff8" stroke-width="2"/>
+                        <path d="M16 6v10" stroke="#b8dbc1" stroke-width="1.5"/>
+                    </g>
+                </svg>
+            </div>
+            <div class="med-brand-content">
+                <p class="med-brand-kicker">Your daily care, organized</p>
+                <h1>Medication Reminder</h1>
+                <p class="med-brand-copy">{copy}</p>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+apply_app_theme()
 
 
 def configured_supabase_client():
@@ -82,8 +334,7 @@ def show_setup_instructions():
 
 
 def render_auth(client):
-    st.title("💊 Medication Reminder")
-    st.caption("Create an account to keep a private medication schedule.")
+    render_brand_header("A simple, private place to manage your medicine schedule.")
     login_tab, signup_tab = st.tabs(["Sign in", "Create account"])
 
     with login_tab:
@@ -164,20 +415,23 @@ def render_app(client, user_id):
     label_to_value = {label: value for label, value in times}
     value_to_label = {value: label for label, value in times}
 
-    st.title("💊 Medication Reminder")
-    st.caption(f"Signed in as {st.session_state.get('user_email', '')}")
-    if st.button("Sign out"):
-        try:
-            client.auth.sign_out()
-        finally:
-            st.session_state.pop("user_id", None)
-            st.session_state.pop("user_email", None)
-            st.session_state.pop("supabase_client", None)
-            st.rerun()
+    render_brand_header("Your schedule at a glance, with simple daily check-ins.")
+    account_col, signout_col = st.columns([5, 1])
+    with account_col:
+        st.caption(f"Signed in as {st.session_state.get('user_email', '')}")
+    with signout_col:
+        if st.button("Sign out"):
+            try:
+                client.auth.sign_out()
+            finally:
+                st.session_state.pop("user_id", None)
+                st.session_state.pop("user_email", None)
+                st.session_state.pop("supabase_client", None)
+                st.rerun()
 
-    st.warning(
-        "This app is a tracking aid, not a substitute for instructions from "
-        "your healthcare professional. It does not send phone alarms."
+    st.caption(
+        "A tracking aid only—not medical advice or a substitute for "
+        "instructions from your healthcare professional."
     )
 
     try:
@@ -337,14 +591,44 @@ def render_app(client, user_id):
             ],
             key=lambda item: item[0],
         )
+        taken_keys = {row.get("dose_key") for row in history}
+        taken_count = sum(
+            1
+            for time_value, medication in scheduled
+            if f"{today_key}|{medication['id']}|{time_value}" in taken_keys
+        )
+        total_count = len(scheduled)
+        with st.container(border=True):
+            summary_col, count_col = st.columns([3, 1])
+            with summary_col:
+                st.markdown("#### Today’s check-in")
+                if total_count:
+                    st.markdown(
+                        '<span class="progress-label">Your personal progress for today</span>',
+                        unsafe_allow_html=True,
+                    )
+                    st.progress(taken_count / total_count)
+                    if taken_count == total_count:
+                        st.caption("All scheduled check-ins are marked complete.")
+                    elif taken_count == 0:
+                        st.caption("Your check-ins will appear here as you mark doses taken.")
+                    else:
+                        st.caption(
+                            f"{total_count - taken_count} "
+                            f"{'check-in' if total_count - taken_count == 1 else 'check-ins'} "
+                            "left to mark."
+                        )
+                else:
+                    st.caption("Add a medicine to start building today’s schedule.")
+            with count_col:
+                st.metric("Checked in", f"{taken_count} / {total_count}")
+
         if not scheduled:
             st.info("Your schedule is empty. Add a medicine in My medicines.")
 
         for time_value, medication in scheduled:
             dose_key = f"{today_key}|{medication['id']}|{time_value}"
-            already_taken = any(
-                row["dose_key"] == dose_key for row in history
-            )
+            already_taken = dose_key in taken_keys
             with st.container(border=True):
                 label = value_to_label.get(time_value, time_value)
                 st.markdown(f"### {label} · {medication['name']}")
